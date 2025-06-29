@@ -17,8 +17,13 @@ struct termios orig_termios;
 /*** terminal ***/
 
 void die(const char *s) {
-  perror(s);
-  exit(1);
+
+    write(STDOUT_FILENO, "\x1b[2J", 4);
+    write(STDOUT_FILENO, "\x1b[H", 3);
+
+    perror(s);
+    exit(1);
+
 }
 
 void disableRawMode() {
@@ -45,12 +50,14 @@ void enableRawMode() {
 }
 
 char editorReadKey() {
+
     int nread;
     char c;
     while ((nread = read(STDIN_FILENO, &c, 1)) != 1) {
         if (nread == -1 && errno != EAGAIN) die("read");
     }
     return c;
+
 }
 
 /*** output ***/
@@ -70,8 +77,10 @@ void editorProcessKeypress() {
     char c = editorReadKey();
     switch (c) {
         case CTRL_KEY('q'):
-        exit(0);
-        break;
+            write(STDOUT_FILENO, "\x1b[2J", 4);
+            write(STDOUT_FILENO, "\x1b[H", 3);
+            exit(0);
+            break;
     }
 
 }
